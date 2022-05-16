@@ -1,192 +1,58 @@
-#ifndef SRC_S21_QUEUE_H_
-#define SRC_S21_QUEUE_H_
+#pragma once
 
 #include <iostream>
 #include <string>
 
 namespace s21 {
+template <class T>
+class queue {
+ private:
+  size_t _size;
+  size_t _capacity;
+  T *_stackptr;
 
-  template <class T>
-  class queue {
-    
-  private:
-    size_t _size;
-    size_t _capacity;
-    T *_stackptr;
+ public:
+  using value_type = T;
+  using reference = T &;
+  using const_reference = const T &;
+  using size_type = size_t;
 
-  public:
-    using value_type = T;
-    using reference = T &;
-    using const_reference = const T &;
-    using size_type = size_t;
+ private:
+  void Destroy_stack();
+  void Reserve_more_capacity(size_type size);
 
-  private:
-    void Destroy_stack();
-    void Reserve_more_capacity(size_type size);
-
-  public:
-    
-    queue();
-    queue(size_type n);
-    queue(std::initializer_list<value_type> const &items);
-    queue(const queue &q);
-    queue(queue &&q);
-    ~queue();
-    queue<value_type> &operator=(queue<value_type> &&q);
-    queue<value_type> &operator=(queue<T> &q);
-
-    const_reference front();
-    const_reference back();
-
-    bool empty();
-    size_type size();
-
-    void push(const_reference value);
-    void pop();
-    void swap(queue& other);
-  };
-}  // namespace s21
-
-namespace s21 {
-
+ public:
   // constructors
-  template <typename T>
-  queue<T>::queue() : _size(0), _capacity(0), _stackptr(nullptr) {}
+  queue();
+  explicit queue(size_type n);
+  queue(std::initializer_list<value_type> const &items);
+  queue(const queue &q);
+  queue(queue &&q);
+  ~queue();
 
-  template <typename T>
-  queue<T>::queue(size_type n) : _size(0), _capacity(n), _stackptr(n ? new value_type[n] : nullptr) {}
+  //  operators
+  queue<value_type> &operator=(queue<value_type> &&q);
+  queue<value_type> &operator=(const queue<T> &q);
 
-  template <typename T>
-  queue<T>::queue(std::initializer_list<value_type> const &items) : _size(0), _capacity(0) {
-    _stackptr = new value_type[items.size()];
-    int i = 0;
-    for (auto it = items.begin(); it != items.end(); it++) _stackptr[i++] = *it;
-    _size = items.size();
-    _capacity = items.size();
-  }
+  // element acces
+  const_reference front();
+  const_reference back();
 
-  template <typename T>
-  queue<T>::queue(const queue &q) : _size(q._size), _capacity(q._capacity) {
-    _stackptr = new value_type[q._capacity];
-    for (size_type i = 0; i < _size; i++) _stackptr[i] = q._stackptr[i];
-  }
+  // capacity
+  bool empty();
+  size_type size();
 
-  template <typename T>
-  queue<T>::queue(queue &&q) : _size(0), _capacity(0), _stackptr(nullptr) {
-    std::swap(_size, q._size);
-    std::swap(_capacity, q._capacity);
-    std::swap(_stackptr, q._stackptr);
-  }
+  // modifiers
+  void push(const_reference value);
+  void pop();
+  void swap(queue &other);
 
-  template <typename T>
-  queue<T>::~queue() {
-    delete[] _stackptr;
-  }
-
-  template <typename T>
-  void queue<T>::Destroy_stack() {
-    _size = 0;
-    _capacity = 0;
-    _stackptr = nullptr;
-  }
-
-  template <typename T>
-  void queue<T>::Reserve_more_capacity(size_type size) {
-    value_type *buff = new value_type[size];
-    for (size_type i = 0; i < _size; ++i) buff[i] = std::move(_stackptr[i]);
-    delete[] _stackptr;
-    _stackptr = buff;
-    _capacity = size;
-  }
-
-  // overload operators
-  template <typename T>
-  queue<T> &queue<T>::operator=(queue<T> &&q) {
-    if (this == &q) {
-      return *this;
-    } else {
-      Destroy_stack();
-      std::swap(_size, q._size);
-      std::swap(_capacity, q._capacity);
-      std::swap(_stackptr, q._stackptr);
-      return *this;
-    }
-  }
-
-  template <typename T>
-  queue<T> &queue<T>::operator=(queue<T> &q) {
-    if (this == &q) {
-      return *this;
-    } else {
-      for (size_type i = 0; i < q._size; i++) push(q._stackptr[i]);
-      return *this;
-    }
-  }
-
-  template <typename T>
-  const T &queue<T>::back() {
-    if (_size == 0) {
-      throw std::invalid_argument("No items available");
-    } else {
-      return _stackptr[_size - 1];
-    }
-  }
-
-  template <typename T>
-  const T &queue<T>::front() {
-    if (_size == 0) {
-      throw std::invalid_argument("No items available");
-    } else {
-      return _stackptr[0];
-    }
-  }
-
-  template <typename T>
-  bool queue<T>::empty() {
-    if (_size) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  template <typename T>
-  size_t queue<T>::size() {
-    return _size;
-  }
-
-  template <typename T>
-  void queue<T>::push(const_reference value) {
-    if (_size >= _capacity) {
-      Reserve_more_capacity(_size + 2);
-    }
-    _stackptr[_size++] = value;
-  }
-
-  template <typename T>
-  void queue<T>::pop() {
-    if (_size == 0) {
-      throw std::invalid_argument("Nothihg to pop");
-    } else {
-      T* q2 = new T[_size - 1];
-      _size--;
-      for (int i = 0; i < _size; i++)
-          q2[i] = _stackptr[i + 1];
-      if (_size > 0)
-          delete[] _stackptr;
-      _stackptr = q2;
-    }
-  }
-
-  template <typename T>
-  void queue<T>::swap(queue &other) {
-    if (!empty() && !other.empty()) {
-      std::swap(_size, other._size);
-      std::swap(_capacity, other._capacity);
-      std::swap(_stackptr, other._stackptr);
-    }
-  }
+  // bonus
+  void emplace_back() {}
+  template <class TYPE, class... Args>
+  void emplace_back(TYPE data, Args... args);
+};
 
 }  // namespace s21
 
-#endif  //    SRC_S21_QUEUE_H_
+#include "s21_queue.inl"

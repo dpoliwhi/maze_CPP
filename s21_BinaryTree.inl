@@ -3,16 +3,10 @@
 namespace s21 {
 
 template <class Key, class T>
-BinaryTree<Key, T>::BinaryTree() {
-  // _tree = new RedBlackTree<Key, T>;
-}
+BinaryTree<Key, T>::BinaryTree() {}
 
 template <class Key, class T>
-BinaryTree<Key, T>::~BinaryTree() {
-  // if (_tree) {
-  // delete _tree;
-  // _tree = nullptr;
-}
+BinaryTree<Key, T>::~BinaryTree() {}
 
 template <class Key, class T>
 BinaryTree<Key, T>::BinaryTree(std::initializer_list<value_type> const& items) {
@@ -27,22 +21,17 @@ BinaryTree<Key, T>::BinaryTree(const BinaryTree& other) {
 }
 
 template <class Key, class T>
-BinaryTree<Key, T>& BinaryTree<Key, T>::operator=(
-    BinaryTree<Key, T>&& other) {
+BinaryTree<Key, T>& BinaryTree<Key, T>::operator=(BinaryTree<Key, T>&& other) {
   clear();
   merge(other);
-  // preorder_insert(other._tree.root, other._tree.leaf);
   other.clear();
   return *this;
 }
 
 template <class Key, class T>
-BinaryTree<Key, T>& BinaryTree<Key, T>::operator=(
-    BinaryTree<Key, T>& other) {
+BinaryTree<Key, T>& BinaryTree<Key, T>::operator=(BinaryTree<Key, T>& other) {
   clear();
-  // preorder_insert(other._tree.root, other._tree.leaf);
   merge(other);
-  // other.clear();
   return *this;
 }
 
@@ -58,16 +47,10 @@ template <class Key, class T>
 BinaryTree<Key, T>::iterator::iterator() : _node(nullptr), _leaf(nullptr) {}
 
 template <class Key, class T>
-BinaryTree<Key, T>::iterator::iterator(Node node, Node leaf) {
-  _node = node;
-  _leaf = leaf;
-}
+BinaryTree<Key, T>::iterator::iterator(Node node, Node leaf) : _node(node), _leaf(leaf) {}
 
 template <class Key, class T>
-BinaryTree<Key, T>::iterator::iterator(const iterator& other) {
-  _node = other._node;
-  _leaf = other._leaf;
-}
+BinaryTree<Key, T>::iterator::iterator(const iterator& other) : _node(other._node), _leaf(other._leaf) {}
 
 template <class Key, class T>
 BinaryTree<Key, T>::iterator::~iterator() {
@@ -77,12 +60,12 @@ BinaryTree<Key, T>::iterator::~iterator() {
 
 template <class Key, class T>
 typename BinaryTree<Key, T>::iterator BinaryTree<Key, T>::begin() {
-  Node buf = new _NodeRBT<Key, T>;
   if (_tree.size() != 0) {
-    buf = find_min_leaf(_tree.root, _tree.leaf);
+    Node buf = find_min_leaf(_tree.root, _tree.leaf);
     iterator res(buf, _tree.leaf);
     return res;
   } else {
+    Node buf = new _NodeRBT<Key, T>;
     buf->data = std::make_pair(0, 0);
     iterator res(buf, _tree.leaf);
     return res;
@@ -95,8 +78,8 @@ typename BinaryTree<Key, T>::iterator BinaryTree<Key, T>::end() {
 }
 
 template <class Key, class T>
-std::pair<typename BinaryTree<Key, T>::iterator, bool>
-BinaryTree<Key, T>::insert_data_AC(const value_type& data) {
+std::pair<typename BinaryTree<Key, T>::iterator, bool> BinaryTree<Key, T>::insert_data_AC(
+    const value_type& data) {
   std::pair<Node, bool> buf = _tree.insert_data(data);
   iterator iter(buf.first, _tree.leaf);
   std::pair<iterator, bool> res = std::make_pair(iter, buf.second);
@@ -164,8 +147,8 @@ template <class Key, class T>
 void BinaryTree<Key, T>::preorder_insert(Node node, Node leaf) {
   if (node != leaf) {
     insert_data_AC(node->data);
-    preorder_insert(node->left, leaf);
     preorder_insert(node->right, leaf);
+    preorder_insert(node->left, leaf);
   }
 }
 
@@ -189,6 +172,8 @@ void BinaryTree<Key, T>::clear() {
   if (size()) {
     _tree.clear_tree();
     _tree.set_size(0);
+    _tree.root = nullptr;
+    _tree.leaf = nullptr;
   }
 }
 
@@ -196,6 +181,7 @@ template <class Key, class T>
 void BinaryTree<Key, T>::erase(iterator pos) {
   std::pair<Key, T> del_pair = *pos;
   _tree.deleteNode(pos._node, del_pair.first);
+  _tree.set_size(_tree.size() - 1);
 }
 
 template <class Key, class T>
@@ -207,6 +193,11 @@ template <class Key, class T>
 bool BinaryTree<Key, T>::contains(const Key& key) {
   std::pair<Node, bool> check_pair = _tree.find_by_key(key);
   return check_pair.second;
+}
+
+template <class Key, class T>
+typename BinaryTree<Key, T>::iterator BinaryTree<Key, T>::find_iterator(const Key& key) {
+  return iterator(_tree.find_by_key(key).first, _tree.leaf);
 }
 
 template <class Key, class T>

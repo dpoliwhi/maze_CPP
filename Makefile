@@ -1,33 +1,11 @@
 CC=g++
 LIB=ar rcs
-FLAGS=#-Werror -Wall -Wextra #-std=c++20 
+FLAGS=-Werror -Wall -Wextra
 LINUX=-lrt -lpthread -lm -D_GNU_SOURCE
 OS=$(shell uname -s)
 CFLAGS=-fprofile-arcs -ftest-coverage
 
-s:
-	$(CC) $(FLAGS) s21_stack.cpp -o s21_stack
-	./s21_stack
-
-v:
-	$(CC) $(FLAGS) s21_vector.cpp -o s21_vector
-	./s21_vector
-
-l:
-	$(CC) $(FLAGS) s21_list.cpp -o s21_list
-	./s21_list
-
-m:
-	$(CC) $(FLAGS) s21_rbtree.cpp -o s21_rbtree
-	./s21_rbtree
-
-as:
-	$(CC) $(FLAGS) main.cpp -o main
-	./main
-
-map:
-	$(CC) $(FLAGS) s21_map.cpp -o map
-	./map
+all: clean test
 
 test:
 ifeq ($(OS), Darwin)
@@ -49,14 +27,12 @@ endif
 	genhtml -o report test.info
 
 clean:
-	rm -rf s21_stack s21_vector s21_list s21_rbtree main map
 	rm -rf *.gc* *.o *.a *.out *.info test
 	rm -rf report/
 
 check:
-	cppcheck --enable=all --language=c++ --suppress=missingIncludeSystem *.cpp *.h
-	python3 ../materials/linters/cpplint.py --extensions=cpp *.cpp *.h
+	cppcheck --enable=all --language=c++ --suppress=missingIncludeSystem --suppress=noExplicitConstructor --suppress=useStlAlgorithm *.cpp *.h
 	make test
 	CK_FORK=no leaks --atExit -- ./test
-	#valgrind --leak-check=full --leak-resolution=med ./test
+	# valgrind --leak-check=full --leak-resolution=med ./test
 	make clean

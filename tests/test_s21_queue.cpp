@@ -68,3 +68,14 @@ TEST(Queue, test6) {
     ASSERT_EQ(d.front() == "abc", true);
     ASSERT_EQ(c.front() == "hi", true);
 }
+
+TEST(Queue, test7) {
+  s21::queue<int> a{55, 44, 33};
+  a.emplace_back(3, 42, 5);
+  ASSERT_EQ(a.size(), 6);
+  ASSERT_EQ(a.back(), 5);
+  ASSERT_EQ(a.front(), 55);
+  a.pop();
+  ASSERT_EQ(a.back(), 5);
+  ASSERT_EQ(a.front(), 44);
+}

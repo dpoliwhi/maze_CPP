@@ -32,9 +32,11 @@ TEST(Vector, test4) {
     d.push_back(1);
     d.push_back(2);
     d.push_back(3);
+    d.push_back(4);
     c.push_back(1);
     c.push_back(2);
     c.push_back(3);
+    c.push_back(4);
     ASSERT_EQ(d.front() == c.front(), true);
     ASSERT_EQ(d.back() == c.back(), true);
     ASSERT_EQ(d.size() == c.size(), true);
@@ -82,6 +84,7 @@ TEST(Vector, test8) {
 TEST(Vector, test9) {
     s21::vector<int> d{1, 2, 3, 4, 5};
     s21::vector<int>::iterator it_d = d.begin();
+    it_d;
     d.insert(it_d, 9);
     s21::vector<int>::iterator it_d1 = d.begin();
     it_d1++;
@@ -90,7 +93,7 @@ TEST(Vector, test9) {
     std::vector<int>::iterator it_c = c.begin();
     c.insert(it_c, 9);
     std::vector<int>::iterator it_c1 = c.begin();
-    it_c1++;
+    ++it_c1;
     c.insert(it_c1, 8);
     ASSERT_EQ(d.front() == c.front(), true);
     ASSERT_EQ(d.size() == c.size(), true);
@@ -116,6 +119,7 @@ TEST(Vector, test11) {
     ASSERT_EQ(d.size() == c.size(), true);
     ASSERT_EQ(d.capacity() == c.capacity(), true);
 }
+
 
 TEST(Vector, test12) {
     s21::vector<int> d{1, 2, 3, 4, 5};
@@ -143,16 +147,17 @@ TEST(Vector, test14) {
 }
 
 TEST(Vector, test15) {
-    s21::vector<int> d;
-    std::vector<int> c;
-    d.push_back(1);
-    d.push_back(2);
-    d.push_back(3);
-    c.push_back(1);
-    c.push_back(2);
-    c.push_back(3);
-    ASSERT_EQ(*(d.end()) == *(c.end()), true);
+  s21::vector<int> d;
+  std::vector<int> c;
+  d.push_back(1);
+  d.push_back(2);
+  d.push_back(3);
+  c.push_back(1);
+  c.push_back(2);
+  c.push_back(3);
+  ASSERT_EQ(*(d.end() - 1) == *(c.end() - 1), true);
 }
+
 
 TEST(Vector, test16) {
     s21::vector<int> d{1, 2, 3, 4, 5};
@@ -179,4 +184,32 @@ TEST(Vector, test17) {
     c.shrink_to_fit();
     ASSERT_EQ(d.size() == d.capacity(), true);
     ASSERT_EQ(c.size() == c.capacity(), true);
+}
+
+TEST(Vector, test18) {
+  s21::vector<int> a{55, 44, 33};
+  a.emplace_back(3, 42, 5);
+  ASSERT_EQ(a.size(), 6);
+  ASSERT_EQ(a.back(), 5);
+  ASSERT_EQ(a.front(), 55);
+}
+
+TEST(Vector, test19) {
+  s21::vector<std::string> a{"a", "b", "c", "d", "e"};
+  a.emplace_back("f", "g", "h");
+  ASSERT_EQ(a.size(), 8);
+  ASSERT_EQ(a.back(), "h");
+  ASSERT_EQ(a.front(), "a");
+}
+
+TEST(Vector, test20) {
+  s21::vector<int> a{1, 2, 3};
+  s21::vector<int>::iterator it = a.begin();
+  ++it;
+  a.emplace(it, 33, 44, 55);
+  ASSERT_EQ(a.size(), 6);
+  s21::vector<int>::iterator ch1 = a.begin();
+  ASSERT_EQ(*ch1, 1);
+  ++ch1;
+  ASSERT_EQ(*ch1, 33);
 }

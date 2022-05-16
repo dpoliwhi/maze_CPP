@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <utility>
@@ -8,10 +10,10 @@ enum nodeColor { BLACK, RED };
 template <class Key, class T>
 struct _NodeRBT {
   std::pair<Key, T> data;
-  nodeColor color;          /* node color (BLACK, RED) */
-  _NodeRBT<Key, T> *left;   /* left child */
-  _NodeRBT<Key, T> *right;  /* right child */
-  _NodeRBT<Key, T> *parent; /* parent */
+  nodeColor color;
+  _NodeRBT<Key, T> *left;
+  _NodeRBT<Key, T> *right;
+  _NodeRBT<Key, T> *parent;
   _NodeRBT();
   _NodeRBT(std::pair<Key, T> pair_data, _NodeRBT<Key, T> *buf);
 };
@@ -46,17 +48,18 @@ class RedBlackTree {
   void clear_tree();
   Node root;
   Node leaf;
+
   // main methods
   std::pair<Node, bool> insert_data(const value_type &data);
   std::pair<Node, bool> find_by_key(const Key &key);
   void deleteNode(Node node, Key key);
+
   // additional methods
   void printTree();
   void inorder_print(Node node);
   size_type size();
   void set_size(size_type size);
 };
-} // namespace s21
+}  // namespace s21
 
 #include "s21_rbtree.inl"
-

@@ -1,5 +1,3 @@
-// #include "s21_rbtree.h"
-
 namespace s21 {
 
 template <class Key, class T>
@@ -13,8 +11,7 @@ _NodeRBT<Key, T>::_NodeRBT(std::pair<Key, T> pair_data, _NodeRBT<Key, T>* buf)
 }
 
 template <class Key, class T>
-RedBlackTree<Key, T>::RedBlackTree() : _size(0) {
-  leaf = new _NodeRBT<Key, T>;
+RedBlackTree<Key, T>::RedBlackTree() : _size(0), leaf(new _NodeRBT<Key, T>) {
   leaf->color = BLACK;
   leaf->left = nullptr;
   leaf->right = nullptr;
@@ -38,7 +35,6 @@ void RedBlackTree<Key, T>::clear_tree() {
   }
 }
 
-
 template <class Key, class T>
 void RedBlackTree<Key, T>::clear_tree_helper(Node root) {
   if (root->left != leaf) {
@@ -49,18 +45,14 @@ void RedBlackTree<Key, T>::clear_tree_helper(Node root) {
   }
   if (root) {
     delete root;
-    root = nullptr;
   }
 }
 
 template <class Key, class T>
 void RedBlackTree<Key, T>::rotate_left(Node x) {
   Node y = x->right;
-  /* establish x->right link */
   x->right = y->left;
   if (y->left != leaf) y->left->parent = x;
-
-  /* establish y->parent link */
   if (y != leaf) y->parent = x->parent;
   if (x->parent) {
     if (x == x->parent->left)
@@ -70,7 +62,6 @@ void RedBlackTree<Key, T>::rotate_left(Node x) {
   } else {
     root = y;
   }
-  /* link x and y */
   y->left = x;
   if (x != leaf) x->parent = y;
 }
@@ -78,10 +69,8 @@ void RedBlackTree<Key, T>::rotate_left(Node x) {
 template <class Key, class T>
 void RedBlackTree<Key, T>::rotate_right(Node x) {
   Node y = x->left;
-  /* establish x->left link */
   x->left = y->right;
   if (y->right != leaf) y->right->parent = x;
-  /* establish y->parent link */
   if (y != leaf) y->parent = x->parent;
   if (x->parent) {
     if (x == x->parent->right)
@@ -91,47 +80,37 @@ void RedBlackTree<Key, T>::rotate_right(Node x) {
   } else {
     root = y;
   }
-  /* link x and y */
   y->right = x;
   if (x != leaf) x->parent = y;
 }
 
 template <class Key, class T>
 void RedBlackTree<Key, T>::insertFixup(Node x) {
-  /* check Red-Black properties */
   while (x != root && x->parent->color == RED) {
-    /* we have a violation */
-    if (x->parent == x->parent->parent->left) {  // we can move this code in other method to decompose
+    if (x->parent == x->parent->parent->left) {
       Node y = x->parent->parent->right;
       if (y->color == RED) {
-        /* uncle is RED */  // we can move this code in other method (same in other case)
         x->parent->color = BLACK;
         y->color = BLACK;
         x->parent->parent->color = RED;
         x = x->parent->parent;
       } else {
-        /* uncle is BLACK */
         if (x == x->parent->right) {
-          /* make x a left child */
           x = x->parent;
           rotate_left(x);
         }
-        /* recolor and rotate */
         x->parent->color = BLACK;
         x->parent->parent->color = RED;
         rotate_right(x->parent->parent);
       }
-    } else {  // we can move this code in other method to decompose
-      /* mirror image of above code */
+    } else {
       Node y = x->parent->parent->left;
       if (y->color == RED) {
-        /* uncle is RED */
         x->parent->color = BLACK;
         y->color = BLACK;
         x->parent->parent->color = RED;
         x = x->parent->parent;
       } else {
-        /* uncle is BLACK */
         if (x == x->parent->left) {
           x = x->parent;
           rotate_right(x);
@@ -179,7 +158,6 @@ template <class Key, class T>
 void RedBlackTree<Key, T>::deleteFixup(Node ch_node) {
   while (ch_node != root && ch_node->color == BLACK) {
     if (ch_node == ch_node->parent->left) {
-      // move in new method - begin
       Node buf = ch_node->parent->right;
       if (buf->color == RED) {
         buf->color = BLACK;
@@ -203,9 +181,7 @@ void RedBlackTree<Key, T>::deleteFixup(Node ch_node) {
         rotate_left(ch_node->parent);
         ch_node = root;
       }
-      // end
     } else {
-      // move in new method - begin
       Node buf = ch_node->parent->left;
       if (buf->color == RED) {
         buf->color = BLACK;
@@ -229,7 +205,6 @@ void RedBlackTree<Key, T>::deleteFixup(Node ch_node) {
         rotate_right(ch_node->parent);
         ch_node = root;
       }
-      // end
     }
   }
   ch_node->color = BLACK;
@@ -332,55 +307,14 @@ std::pair<typename RedBlackTree<Key, T>::Node, bool> RedBlackTree<Key, T>::find_
 template <class Key, class T>
 std::pair<typename RedBlackTree<Key, T>::Node, bool> RedBlackTree<Key, T>::insert_data(
     const value_type& data) {
-  Node new_node = new _NodeRBT<Key, T>(data, leaf);
   if (find_by_key(data.first).second == true) {
-    delete new_node;
     return std::make_pair(leaf, false);
   }
+  Node new_node = new _NodeRBT<Key, T>(data, leaf);
   insertNode(new_node);
   insertFixup(new_node);
-  _size++;
+  ++_size;
   return std::make_pair(new_node, true);
-}
-
-template <class Key, class T>
-void RedBlackTree<Key, T>::printTree() {
-  if (root) {
-    printHelper(this->root, "", true);
-  }
-}
-
-template <class Key, class T>
-void RedBlackTree<Key, T>::printHelper(Node root, std::string indent, bool last) {
-  if (root != leaf) {
-    std::cout << indent;
-    if (last) {
-      std::cout << "R----";
-      indent += "   ";
-    } else {
-      std::cout << "L----";
-      indent += "|  ";
-    }
-    std::string sColor;
-    if (root->color == RED)
-      sColor = "RED";
-    else if (root->color == BLACK)
-      sColor = "BLACK";
-    // std::string sColor = root->color;
-    std::cout << root->data.second << "(" << sColor << ")" << std::endl;
-    printHelper(root->left, indent, false);
-    printHelper(root->right, indent, true);
-  }
-}
-
-// Inorder print
-template <class Key, class T>
-void RedBlackTree<Key, T>::inorder_print(Node node) {
-  if (node != leaf) {
-    inorder_print(node->left);
-    std::cout << node->data.first << " ";
-    inorder_print(node->right);
-  }
 }
 
 template <class Key, class T>
@@ -393,40 +327,4 @@ void RedBlackTree<Key, T>::set_size(size_type size) {
   _size = size;
 }
 
-
 }  // namespace s21
-
-// using namespace s21;
-// int main() {
-//   s21::RedBlackTree<int, int> one;
-//   std::pair<int, int> pair_one = std::make_pair(44, 44);
-//   one.insert_data(pair_one);
-//   pair_one = std::make_pair(33, 33);
-//   one.insert_data(pair_one);
-//   pair_one = std::make_pair(77, 77);
-//   one.insert_data(pair_one);
-//   pair_one = std::make_pair(88, 88);
-//   one.insert_data(pair_one);
-//   pair_one = std::make_pair(99, 99);
-//   one.insert_data(pair_one);
-//   pair_one = std::make_pair(22, 222);
-//   one.insert_data(pair_one);
-//   pair_one = std::make_pair(11, 11);
-//   one.insert_data(pair_one);
-//   pair_one = std::make_pair(5, 5);
-//   one.insert_data(pair_one);
-//   pair_one = std::make_pair(8, 8);
-//   one.insert_data(pair_one);
-//   one.printTree();
-
-//   one.deleteNode(one.root, 77);
-//   one.printTree();
-//   // std::pair<typename RedBlackTree<int, int>::Node, bool> find_node;
-//   // find_node = one.find_by_key(21);
-//   // find_node.second ? std::cout << "TRUE\n" : std::cout << "FALSE\n";
-//   // std::cout << find_node.first->data.second << std::endl;
-
-//   // one.printTree();
-//   // one.inorder_print(one.root);
-//   return 0;
-// }
