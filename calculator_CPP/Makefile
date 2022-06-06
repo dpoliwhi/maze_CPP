@@ -19,7 +19,7 @@ build:
 	cd $(DIRBUILD) && qmake s21_calculator.pro && make
 
 dvi:
-	open readme.html
+	open Readme.md
 
 dist:
 	tar -cvf s21_calc_tar.tar s21_calc_cpp/* readme.html Makefile
