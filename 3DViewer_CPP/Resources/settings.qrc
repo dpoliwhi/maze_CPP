@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/conf">
+        <file>settings.conf</file>
+    </qresource>
+</RCC>
