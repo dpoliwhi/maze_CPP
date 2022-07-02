@@ -1,5 +1,5 @@
 <p align="center">
-<img src="Readme/Maze_L2.jpg" alt="drawing"/>
+<img src="Readme/Maze_L2.JPG" alt="drawing"/>
 </p>
 
 # **Maze** for macOS
